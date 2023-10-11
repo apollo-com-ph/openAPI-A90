@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: Example API
+  description: This is an OpenAPI YAML file for the Example API.
+  version: 1.0.0
+servers:
+  - url: https://example.com
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  headers:
+    Authorization:
+      schema:
+        type: string
+        description: The authorization token.
+      example: Bearer xxxx
+    snid:
+      schema:
+        type: string
+        description: The SNID of the terminal.
+      example: 1234567890
+paths:
+  /configuration/{terminalId}:
+    get:
+      tags:
+        - Configuration
+      summary: Get the configuration for a terminal.
+      parameters:
+        - name: terminalId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: The ID of the terminal.
+      security:
+        - BearerAuth: []
+      headers:
+        - $ref: '#/components/headers/Authorization'
+        - $ref: '#/components/headers/snid'
+      responses:
+        '200':
+          description: The configuration for the terminal.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    description: Zip file containing the configuration.
+        '401':
+          description: Unauthorized.
+        '404':
+          description: Terminal not found.
+    put:
+      tags:
+        - Configuration
+      summary: Update the configuration for a terminal.
+      parameters:
+        - name: terminalId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: The ID of the terminal.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                terminalId:
+                  type: string
+                  description: The ID of the terminal.
+                terminalMode:
+                  type: string
+                  description: The new terminal mode.
+      security:
+        - BearerAuth: []
+      headers:
+        - $ref: '#/components/headers/Authorization'
+        - $ref: '#/components/headers/snid'
+      responses:
+        '200':
+          description: The configuration for the terminal was updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: "Success"
+        '401':
+          description: Unauthorized.
+        '404':
+          description: Terminal not found.
+  /configuration/updateSTAN:
+    put:
+      tags:
+        - Configuration
+      summary: Update the STAN for a terminal.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                terminalId:
+                  type: string
+                  description: The ID of the terminal.
+                merchantId:
+                  type: string
+                  description: The ID of the merchant.
+      security:
+        - BearerAuth: []
+      headers:
+        - $ref: '#/components/headers/Authorization'
+        - $ref: '#/components/headers/snid'
+      responses:
+        '200':
+          description: The STAN for the terminal was updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: "Success"
+        '401':
+          description: Unauthorized.
+        '404':
+          description: Terminal not found.
+  /Payment/webhook:
+    post:
+      tags:
+        - Payment
+      summary: Maya webhook endpoint.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                paymentStatus:
+                  type: string
+                paymentId:
+                  type: string
+                ...
+                other fields
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "OK"
